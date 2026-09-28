@@ -159,7 +159,7 @@ Persistent storage is implemented to enable nodes to reconnect to the network us
 ### Installation & Setup
 Clone project into your local machine
 ```bash
-git clone https://github.com/Rahan-M/BlockChain_Prototype.git
+git clone https://github.com/TatHack-Tathva/Blockchain-Simulation.git
 ```
 Enter into the project folder
 ```bash

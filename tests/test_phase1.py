@@ -893,7 +893,8 @@ def test_private_key_file_permissions_and_encryption(tmp_path, monkeypatch):  # 
     w = Wallet()
     storage_manager.save_key(w.private_key_pem, "pos", "k")
     path = os.path.join(storage_manager.get_consensus_dir("pos", "k"), "keys.json")
-    assert stat.S_IMODE(os.stat(path).st_mode) == 0o600
+    if os.name != "nt":
+    	assert stat.S_IMODE(os.stat(path).st_mode) == 0o600
     monkeypatch.setenv(storage_manager.KEY_PASSPHRASE_ENV, "s3cret")
     storage_manager.save_key(w.private_key_pem, "pos", "k")
     assert w.private_key_pem not in open(path).read()

@@ -239,7 +239,7 @@ def test_pow_mining_can_be_cancelled():
 
 def pos_chain(wallet):
     chain = posbs.Chain(publicKey=wallet.public_key_pem, privatekey=wallet.private_key, epoch_time=EPOCH)
-    chain.chain[0].ts = posbs.now_ms() - 120_000
+    chain.chain[0].ts = posbs.now_ms() - 3_600_000  # an hour of past epochs to pick lottery rounds from
     chain.chain[0].sign_with(wallet.private_key)
     return chain
 
@@ -277,8 +277,10 @@ def funded_pos_chain():
 
 def find_ts(chain, predicate):
     prev = chain.lastBlock
-    for i in range(1, 500):
+    for i in range(1, 3500):
         ts = prev.ts + i * EPOCH * 1000
+        if ts > posbs.now_ms():
+            break
         seed = posbs.compute_seed(chain.chain, len(chain.chain), ts, EPOCH)
         if predicate(seed):
             return ts

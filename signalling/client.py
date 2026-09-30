@@ -94,7 +94,7 @@ class SignallingClient:
             self.state = "connecting"
             try:
                 async with connect(self.url, max_size=MAX_MESSAGE_SIZE, open_timeout=REQUEST_TIMEOUT,
-                                   ping_interval=5, ping_timeout=5, close_timeout=2) as ws:
+                                   ping_interval=5, ping_timeout=5) as ws:
                     self._ws = ws
                     self.state = "connected"
                     self.connects += 1

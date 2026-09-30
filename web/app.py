@@ -70,6 +70,10 @@ def create_app(node):
     def dashboard():
         return send_from_directory(STATIC_DIR, "dashboard.html")
 
+    @app.get("/favicon.ico")
+    def favicon():
+        return "", 204
+
     @app.get("/static/<path:name>")
     def static_files(name):
         if name not in ("dashboard.js", "dashboard.css"):

@@ -286,6 +286,23 @@ submit coin transfers and stake (PoS). JSON API:
 The web layer never exposes private keys, files, contract deployment or any kind of code / shell
 execution, and binds to 127.0.0.1 by default. Browsers disconnecting has no effect on the node.
 
+### Enhanced Monitoring Dashboard
+The web interface (`--web-port`) is a network monitoring console built from the node's existing JSON API
+(vanilla JS, no build step, 2 s polling with a stale/offline indicator and automatic retry):
+- **Network topology** - SVG view of this node, its known peers, direct P2P links (in/out) and signalling
+  room membership, with honest / malicious (self-declared) status and consensus type.
+- **Live network activity** - event console of the latest 20 changes observed between polls (transactions
+  validated and confirmed, blocks created or received, stakes, peers joining / leaving, P2P links,
+  signalling reconnects, rejected data).
+- **Consensus / validator panel** - PoS epoch progress and stake registration window, validators and total
+  stake; PoW difficulty and miner; PoA authorities, admin and round time.
+- **Network statistics** - height, confirmed / pending / rejected transactions, peers, active nodes,
+  average block interval and a transactions-per-block chart from the local chain.
+- **Network security** - honest / malicious nodes, rejected data, invalid blocks and transactions,
+  chain validation, genesis check against the room, slashed blocks.
+- **Blockchain explorer** - expandable blocks (hash, previous hash, timestamp, validator / miner, stake,
+  transactions) and a transaction list with CONFIRMED / PENDING / REJECTED status and copy buttons.
+
 ### 9. Tests
 ```bash
 python -m pytest tests -q                              # everything (~40 s)

@@ -3,78 +3,136 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Node Dashboard</title>
+  <title>Network Monitor · Node Dashboard</title>
   <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 <body>
-<header>
-  <div>
-    <h1 id="title">Node</h1>
-    <div class="sub"><span id="consensus-badge" class="badge"></span> <span id="role-badge" class="badge"></span>
-      <span id="state"></span></div>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-name">Blockchain Simulator</span>
+    <span class="brand-sep">/</span>
+    <span class="brand-sub">Network Monitor</span>
   </div>
-  <div id="conn-status" class="status">connecting…</div>
+  <div class="topmeta" id="topmeta">
+    <span class="meta-item" id="meta-consensus">—</span>
+    <span class="meta-item">Node <b id="meta-node">—</b></span>
+    <span class="meta-item"><i class="dot" id="meta-online-dot"></i><span id="meta-online">CONNECTING</span></span>
+    <span class="meta-item"><i class="dot" id="meta-net-dot"></i><span id="meta-net">—</span></span>
+    <span class="meta-item">Room <b class="mono" id="meta-room">—</b></span>
+  </div>
+  <div class="live" id="live"><i class="dot" id="live-dot"></i><span id="live-label">LIVE</span>
+    <span class="muted" id="updated">waiting for first update</span></div>
 </header>
+<div class="banner hidden" id="banner">API unreachable — showing last known state, retrying every 2 s.</div>
 
-<main>
-  <section class="card" id="node-card">
-    <h2>Node</h2>
-    <dl id="node-info"></dl>
-    <div id="consensus-extra"></div>
+<main class="grid">
+  <section class="metrics span-12" id="metrics" aria-label="Key metrics"></section>
+
+  <section class="panel span-7">
+    <div class="panel-head"><h2>Network topology</h2><span class="muted" id="topo-caption"></span></div>
+    <div class="topo-wrap"><svg id="topology" viewBox="0 0 640 280" role="img" aria-label="Network topology"></svg></div>
+    <div class="legend">
+      <span><i class="ln ln-p2p"></i>P2P link (connected)</span>
+      <span><i class="ln ln-down"></i>known, not connected</span>
+      <span><i class="ln ln-sig"></i>signalling room membership</span>
+      <span><i class="sw sw-self"></i>this node</span>
+      <span><i class="sw sw-mal"></i>malicious (self-declared)</span>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Signalling room</h2>
-    <dl id="room-info"></dl>
-    <form id="room-form" autocomplete="off">
-      <input id="room-name" name="room" placeholder="room id" maxlength="64" required pattern="[A-Za-z0-9_.\-]{1,64}">
-      <button type="submit" data-action="create">Create room</button>
-      <button type="submit" data-action="join">Join room</button>
-    </form>
-    <div id="room-result" class="result"></div>
-    <table class="compact"><thead><tr><th>Room</th><th>Consensus</th><th>Members</th></tr></thead>
-      <tbody id="rooms"></tbody></table>
+  <section class="panel span-5 stack">
+    <div>
+      <div class="panel-head"><h2>Node</h2><span class="muted mono" id="node-id-short"></span></div>
+      <dl class="kv" id="node-kv"></dl>
+    </div>
+    <div>
+      <div class="panel-head"><h2>Consensus</h2><span class="muted" id="consensus-caption"></span></div>
+      <dl class="kv" id="consensus-kv"></dl>
+      <div id="epoch-bar" class="progress hidden"><div class="progress-reg"></div><div class="progress-fill" id="epoch-fill"></div></div>
+      <div class="muted small" id="epoch-note"></div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>Submit transaction</h2>
-    <form id="tx-form" autocomplete="off">
-      <input id="tx-receiver" list="peer-names" placeholder="receiver name or public key" required>
-      <datalist id="peer-names"></datalist>
-      <input id="tx-amount" type="number" step="any" min="0" placeholder="amount" required>
-      <button type="submit">Send</button>
-    </form>
-    <div id="tx-result" class="result"></div>
-    <form id="stake-form" class="hidden" autocomplete="off">
-      <input id="stake-amount" type="number" step="1" min="1" placeholder="stake amount" required>
-      <button type="submit">Stake</button>
-    </form>
-    <div id="stake-result" class="result"></div>
+  <section class="panel span-6">
+    <div class="panel-head"><h2>Live network activity</h2><span class="muted">latest 20 observed events</span></div>
+    <ol class="console" id="activity"><li class="empty">Waiting for the first snapshot…</li></ol>
   </section>
 
-  <section class="card wide">
-    <h2>Network <span id="conn-counts" class="muted"></span></h2>
-    <table><thead><tr><th>Name</th><th>Node ID</th><th>Address</th><th>Port</th><th>Consensus</th>
-      <th>Role</th><th>Connection</th><th>In room</th></tr></thead>
-      <tbody id="peers"></tbody></table>
+  <section class="panel span-3">
+    <div class="panel-head"><h2>Network security</h2></div>
+    <dl class="kv" id="security-kv"></dl>
+    <h3>Recent rejections</h3>
+    <ul class="rejects" id="rejections"><li class="empty">none</li></ul>
   </section>
 
-  <section class="card wide">
-    <h2>Blocks <span id="height" class="muted"></span></h2>
-    <table><thead><tr><th>#</th><th>Hash</th><th>Creator</th><th>Validator</th><th>Txs</th><th>Time</th></tr></thead>
-      <tbody id="blocks"></tbody></table>
-    <div id="block-detail" class="hidden"></div>
+  <section class="panel span-3 stack">
+    <div>
+      <div class="panel-head"><h2>Submit transaction</h2></div>
+      <form id="tx-form" class="form" autocomplete="off">
+        <input id="tx-receiver" list="peer-names" placeholder="receiver (peer name or public key)" required>
+        <datalist id="peer-names"></datalist>
+        <div class="row">
+          <input id="tx-amount" type="number" step="any" min="0" placeholder="amount" required>
+          <button type="submit">Send</button>
+        </div>
+      </form>
+      <div class="result" id="tx-result"></div>
+    </div>
+    <div id="stake-box" class="hidden">
+      <div class="panel-head"><h2>Stake</h2></div>
+      <form id="stake-form" class="form row" autocomplete="off">
+        <input id="stake-amount" type="number" step="1" min="1" placeholder="amount (integer)" required>
+        <button type="submit">Stake</button>
+      </form>
+      <div class="result" id="stake-result"></div>
+    </div>
+    <div>
+      <div class="panel-head"><h2>Signalling room</h2></div>
+      <form id="room-form" class="form" autocomplete="off">
+        <input id="room-name" placeholder="room id" maxlength="64" required pattern="[A-Za-z0-9_.\-]{1,64}">
+        <div class="row">
+          <button type="submit" data-action="create">Create</button>
+          <button type="submit" data-action="join" class="secondary">Join</button>
+        </div>
+      </form>
+      <div class="result" id="room-result"></div>
+      <table class="tbl compact"><thead><tr><th>Room</th><th>Consensus</th><th class="num">Members</th></tr></thead>
+        <tbody id="rooms"><tr><td colspan="3" class="empty">—</td></tr></tbody></table>
+    </div>
   </section>
 
-  <section class="card wide">
-    <h2>Recent transactions</h2>
-    <table><thead><tr><th>ID</th><th>From</th><th>To</th><th>Amount</th><th>Type</th><th>Status</th><th>Block</th></tr></thead>
-      <tbody id="transactions"></tbody></table>
+  <section class="panel span-12">
+    <div class="panel-head">
+      <h2>Network statistics</h2>
+      <span class="muted">from the local chain (last 500 blocks) and this node's view of the network</span>
+    </div>
+    <div class="stats">
+      <dl class="kv kv-cols" id="stats-kv"></dl>
+      <div class="chart">
+        <div class="chart-title">Transactions per block <span class="muted" id="chart-range"></span></div>
+        <svg id="tx-chart" viewBox="0 0 400 90" role="img" aria-label="Transactions per block"></svg>
+      </div>
+    </div>
   </section>
 
-  <section class="card wide">
-    <h2>Recently rejected (validation)</h2>
-    <ul id="rejections" class="muted"></ul>
+  <section class="panel span-12">
+    <div class="panel-head">
+      <h2>Blockchain explorer</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="blocks" role="tab">Blocks</button>
+        <button class="tab" data-tab="txs" role="tab">Transactions</button>
+      </div>
+    </div>
+    <div id="tab-blocks">
+      <table class="tbl"><thead><tr><th></th><th>Block</th><th>Hash</th><th>Previous</th><th>Timestamp</th>
+        <th id="creator-head">Validator / Miner</th><th class="num">Txs</th><th>Status</th></tr></thead>
+        <tbody id="blocks"><tr><td colspan="8" class="empty">No blocks yet</td></tr></tbody></table>
+    </div>
+    <div id="tab-txs" class="hidden">
+      <table class="tbl"><thead><tr><th>Transaction ID</th><th>Sender</th><th>Receiver</th><th class="num">Amount</th>
+        <th>Type</th><th>Status</th><th class="num">Block</th><th>Timestamp</th></tr></thead>
+        <tbody id="transactions"><tr><td colspan="8" class="empty">No transactions yet</td></tr></tbody></table>
+    </div>
   </section>
 </main>
 <script src="/static/dashboard.js"></script>

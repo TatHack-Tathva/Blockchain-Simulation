@@ -1,0 +1,29 @@
+:root { --bg:#f6f7f9; --card:#fff; --text:#1b1f24; --muted:#667085; --line:#e4e7ec; --accent:#2563eb;
+        --ok:#16a34a; --bad:#dc2626; --warn:#d97706; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#0f1115; --card:#171a21; --text:#e6e8eb; --muted:#98a2b3; --line:#2a2f3a; --accent:#60a5fa; }
+}
+* { box-sizing: border-box; }
+body { margin:0; font:14px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--text); }
+header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px;
+         border-bottom:1px solid var(--line); background:var(--card); }
+h1 { margin:0; font-size:20px; } h2 { margin:0 0 8px; font-size:15px; }
+.sub { color:var(--muted); margin-top:4px; }
+main { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:12px; padding:12px 16px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; min-width:0; overflow-x:auto; }
+.wide { grid-column:1 / -1; }
+dl { display:grid; grid-template-columns:max-content 1fr; gap:2px 12px; margin:0 0 8px; }
+dt { color:var(--muted); } dd { margin:0; overflow-wrap:anywhere; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th, td { text-align:left; padding:4px 6px; border-bottom:1px solid var(--line); white-space:nowrap; }
+th { color:var(--muted); font-weight:600; }
+tbody tr.clickable { cursor:pointer; } tbody tr.clickable:hover { background:rgba(127,127,127,.08); }
+.badge { display:inline-block; padding:1px 8px; border-radius:999px; border:1px solid var(--line); font-size:12px; }
+.badge.malicious, .bad { color:var(--bad); } .badge.honest, .ok { color:var(--ok); }
+.muted { color:var(--muted); font-weight:normal; }
+form { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+input { flex:1 1 140px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--text); }
+button { padding:6px 10px; border:1px solid var(--accent); background:var(--accent); color:#fff; border-radius:6px; cursor:pointer; }
+.result { min-height:1.4em; font-size:13px; } .hidden { display:none; }
+.status { font-size:13px; } .status.ok { color:var(--ok); } .status.bad { color:var(--bad); }
+code { font-size:12px; }

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Node Dashboard</title>
+  <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1 id="title">Node</h1>
+    <div class="sub"><span id="consensus-badge" class="badge"></span> <span id="role-badge" class="badge"></span>
+      <span id="state"></span></div>
+  </div>
+  <div id="conn-status" class="status">connecting…</div>
+</header>
+
+<main>
+  <section class="card" id="node-card">
+    <h2>Node</h2>
+    <dl id="node-info"></dl>
+    <div id="consensus-extra"></div>
+  </section>
+
+  <section class="card">
+    <h2>Signalling room</h2>
+    <dl id="room-info"></dl>
+    <form id="room-form" autocomplete="off">
+      <input id="room-name" name="room" placeholder="room id" maxlength="64" required pattern="[A-Za-z0-9_.\-]{1,64}">
+      <button type="submit" data-action="create">Create room</button>
+      <button type="submit" data-action="join">Join room</button>
+    </form>
+    <div id="room-result" class="result"></div>
+    <table class="compact"><thead><tr><th>Room</th><th>Consensus</th><th>Members</th></tr></thead>
+      <tbody id="rooms"></tbody></table>
+  </section>
+
+  <section class="card">
+    <h2>Submit transaction</h2>
+    <form id="tx-form" autocomplete="off">
+      <input id="tx-receiver" list="peer-names" placeholder="receiver name or public key" required>
+      <datalist id="peer-names"></datalist>
+      <input id="tx-amount" type="number" step="any" min="0" placeholder="amount" required>
+      <button type="submit">Send</button>
+    </form>
+    <div id="tx-result" class="result"></div>
+    <form id="stake-form" class="hidden" autocomplete="off">
+      <input id="stake-amount" type="number" step="1" min="1" placeholder="stake amount" required>
+      <button type="submit">Stake</button>
+    </form>
+    <div id="stake-result" class="result"></div>
+  </section>
+
+  <section class="card wide">
+    <h2>Network <span id="conn-counts" class="muted"></span></h2>
+    <table><thead><tr><th>Name</th><th>Node ID</th><th>Address</th><th>Port</th><th>Consensus</th>
+      <th>Role</th><th>Connection</th><th>In room</th></tr></thead>
+      <tbody id="peers"></tbody></table>
+  </section>
+
+  <section class="card wide">
+    <h2>Blocks <span id="height" class="muted"></span></h2>
+    <table><thead><tr><th>#</th><th>Hash</th><th>Creator</th><th>Validator</th><th>Txs</th><th>Time</th></tr></thead>
+      <tbody id="blocks"></tbody></table>
+    <div id="block-detail" class="hidden"></div>
+  </section>
+
+  <section class="card wide">
+    <h2>Recent transactions</h2>
+    <table><thead><tr><th>ID</th><th>From</th><th>To</th><th>Amount</th><th>Type</th><th>Status</th><th>Block</th></tr></thead>
+      <tbody id="transactions"></tbody></table>
+  </section>
+
+  <section class="card wide">
+    <h2>Recently rejected (validation)</h2>
+    <ul id="rejections" class="muted"></ul>
+  </section>
+</main>
+<script src="/static/dashboard.js"></script>
+</body>
+</html>

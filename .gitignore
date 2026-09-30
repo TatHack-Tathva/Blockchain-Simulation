@@ -1,4 +1,5 @@
 ipfs/retreived
+ipfs/uploads
 
 # Virtual environments
 venv/
@@ -8,12 +9,15 @@ newEnv/
 # Python cache and bytecode files
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Temporary files
 haha.txt
 todo.md
 
-# Storage folders
+# Storage folders (contain private keys - never commit)
 storage/poa/
 storage/pos/
 storage/pow/
+
+.venv/

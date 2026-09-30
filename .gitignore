@@ -19,3 +19,5 @@ todo.md
 storage/poa/
 storage/pos/
 storage/pow/
+
+.venv/

@@ -1163,6 +1163,15 @@ class BasePeer:
     async def api_snapshot(self, what, *args):
         return getattr(self, f"snapshot_{what}")(*args)
 
+    async def api_submit_payment(self, receiver, amount):
+        tx = await self.submit_payment(receiver, amount)
+        return self.transaction_summary(tx, "pending")
+
+    async def api_rooms(self):
+        if self.signalling is None:
+            return {"rooms": [], "signalling": None}
+        return {"rooms": await self.signalling.list_rooms(), "signalling": self.signalling.status()}
+
     # ------------------------------------------------------------ interactive
 
     async def ainput(self, prompt):

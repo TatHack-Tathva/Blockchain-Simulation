@@ -2,7 +2,8 @@ import os
 import re
 import json
 
-BASE_STORAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+# BLOCKCHAIN_STORAGE_DIR lets tests / demos keep node data outside the repository
+BASE_STORAGE_DIR = os.environ.get("BLOCKCHAIN_STORAGE_DIR") or os.path.dirname(os.path.abspath(__file__))
 VALID_CONSENSUS = ("pow", "pos", "poa")
 KEY_PASSPHRASE_ENV = "BLOCKCHAIN_KEY_PASSPHRASE"
 _PROFILE_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
